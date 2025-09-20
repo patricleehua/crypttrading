@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: ship-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: crypt_trading_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - crypt_trading:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  crypt_trading:
