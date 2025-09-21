@@ -7,9 +7,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 const tabs = [
-  { id: 'overview', name: '仪表盘首页', href: '/dashboard' },
-  { id: 'datasource', name: '数据采集源配置', href: '/dashboard/datasource' },
-  { id: 'trading', name: '交易账号配置', href: '/dashboard/trading' },
+  { id: 'overview', name: '仪表板', href: '/dashboard' },
+  { id: 'subscriptions', name: 'RSS订阅', href: '/dashboard/subscriptions' },
+  { id: 'content', name: '内容推送', href: '/dashboard/content' },
   { id: 'system', name: '系统管理', href: '/dashboard/system' },
 ];
 
@@ -43,7 +43,7 @@ export default function DashboardLayout({
         <div className="bg-white shadow">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center py-6">
-              <h1 className="text-2xl font-bold text-gray-900">量化交易管理后台</h1>
+              <h1 className="text-2xl font-bold text-gray-900">RSS采集系统</h1>
               <div className="flex items-center space-x-4">
                 <div className="text-sm text-gray-500">
                   <span className="font-medium">{user?.username}</span>

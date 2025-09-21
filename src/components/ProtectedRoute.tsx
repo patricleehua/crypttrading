@@ -16,14 +16,17 @@ export default function ProtectedRoute({ children, requiredPermission, requiredR
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    // Only redirect after hydration to prevent SSR/client mismatch
+    if (typeof window !== 'undefined') {
+      if (!isLoading && !isAuthenticated) {
+        router.push('/login');
+        return;
+      }
 
-    if (user && !checkAccess()) {
-      router.push('/dashboard'); // 重定向到仪表盘
-      return;
+      if (user && !checkAccess()) {
+        router.push('/dashboard'); // 重定向到仪表盘
+        return;
+      }
     }
   }, [isAuthenticated, isLoading, user, requiredPermission, requiredRole, requiredAnyRole, router]);
 

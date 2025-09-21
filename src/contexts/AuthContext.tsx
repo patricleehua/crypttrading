@@ -35,17 +35,23 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    // Mark as hydrated to prevent SSR/client mismatch
+    setIsHydrated(true);
+
     // 检查本地存储的用户信息
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-        localStorage.removeItem('currentUser');
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          setUser(userData);
+        } catch (error) {
+          console.error('Failed to parse user data:', error);
+          localStorage.removeItem('currentUser');
+        }
       }
     }
     setIsLoading(false);
@@ -53,28 +59,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = (userData: User) => {
     setUser(userData);
-    localStorage.setItem('currentUser', JSON.stringify(userData));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('currentUser');
 
-    // 记录登出日志
-    const logoutLog = {
-      id: Date.now().toString(),
-      user: user?.username || 'unknown',
-      email: user?.email || '',
-      timestamp: new Date().toLocaleString('zh-CN'),
-      ip: '192.168.1.100',
-      userAgent: navigator.userAgent,
-      location: '本地网络',
-      status: 'success' as const,
-      action: '用户登出'
-    };
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('currentUser');
 
-    const existingLogs = JSON.parse(localStorage.getItem('loginLogs') || '[]');
-    localStorage.setItem('loginLogs', JSON.stringify([logoutLog, ...existingLogs]));
+      // 记录登出日志
+      const logoutLog = {
+        id: Date.now().toString(),
+        user: user?.username || 'unknown',
+        email: user?.email || '',
+        timestamp: new Date().toLocaleString('zh-CN'),
+        ip: '192.168.1.100',
+        userAgent: navigator.userAgent,
+        location: '本地网络',
+        status: 'success' as const,
+        action: '用户登出'
+      };
+
+      const existingLogs = JSON.parse(localStorage.getItem('loginLogs') || '[]');
+      localStorage.setItem('loginLogs', JSON.stringify([logoutLog, ...existingLogs]));
+    }
   };
 
   // RBAC权限检查函数（支持通配符）
